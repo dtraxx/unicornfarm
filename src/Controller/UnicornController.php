@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Entity\Post;
 use App\Entity\Unicorn;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -35,6 +35,9 @@ class UnicornController extends AbstractController
         return $this->json($data);
     }
 
+    /**
+     * @Route("/unicorn", name="unicorn_new", methods={"POST"})
+     */
     public function new(ManagerRegistry $doctrine, Request $request): Response
     {
         $entityManager = $doctrine->getManager();
@@ -111,7 +114,7 @@ class UnicornController extends AbstractController
         $unicorn = $entityManager->getRepository(unicorn::class)->find($id);
 
         if (!$unicorn) {
-            return $this->json('No unicorn found for id' . $id, 404);
+            return $this->json('No unicorn found for id ' . $id, 404);
         }
 
         $entityManager->remove($unicorn);
@@ -132,6 +135,10 @@ class UnicornController extends AbstractController
                 ['unicorn_id' => $unicornId],
                 ['unicorn_id' => 'desc']
             );
+
+        if(!$posts){
+            return $this->json('No posts found for unicorn_id ' . $unicornId, 404);
+        }
 
         $data = [];
 
